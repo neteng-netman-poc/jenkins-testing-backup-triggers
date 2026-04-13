@@ -85,6 +85,59 @@ def promote_beta_config(hostname: str):
     response = requests.request("POST", url, headers=headers, data=payload)
 
     print(response.text)
-    
 
+
+def promote_golden_config(hostname: str):
+    url = "https://api-netman.dheerajgajula.com/api/config/promote-golden"
+
+    payload = json.dumps({
+        "router_hostname": hostname
+    })
+    headers = {
+        'accept': 'application/json',
+        'Content-Type': 'application/json'
+    }
+
+    response = requests.request("POST", url, headers=headers, data=payload)
+
+    print(response.text)
+
+
+def populate_golden_configs():
+    """
+    Populate golden configs for all routers.
+    Steps:
+      1. Pull running config from each router and push to beta (push-beta)
+      2. Promote beta to golden_running (promote-beta)
+      3. Promote golden_running to golden (promote-golden)
+    """
+    with open("ip_hostname_mapping.json") as f:
+        ip_map = json.load(f)
+
+    hostnames = list(ip_map.values())
+    failed = []
+
+    for hostname in hostnames:
+        try:
+            print(f" Backing up running config for {hostname} (push-beta)...")
+            result = backup_config(hostname)
+            print(f"[OK] push-beta: {result}")
+
+            print(f" Promoting beta config for {hostname} (promote-beta)...")
+            promote_beta_config(hostname)
+
+            print(f" Promoting to golden config for {hostname} (promote-golden)...")
+            promote_golden_config(hostname)
+
+            print(f"[OK] {hostname} golden config populated.\n")
+        except Exception as e:
+            print(f"[ERROR] {hostname}: {e}")
+            failed.append(hostname)
+
+    if failed:
+        print(f"\n=== GOLDEN POPULATE FAILED FOR: {', '.join(failed)} ===")
+    else:
+        print(f"\n=== ALL GOLDEN CONFIGS POPULATED FOR COLLECTION: ===")
+
+    return failed
 
