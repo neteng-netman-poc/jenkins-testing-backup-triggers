@@ -1,0 +1,6 @@
+device_type,ip,username,password,secret
+cisco_ios,192.168.100.1,admin,lab123,lab123
+cisco_ios,192.168.100.2,admin,lab123,lab123
+cisco_ios,192.168.100.3,admin,lab123,lab123
+cisco_ios,192.168.100.4,admin,lab123,lab123
+cisco_ios,192.168.100.5,admin,lab123,lab123

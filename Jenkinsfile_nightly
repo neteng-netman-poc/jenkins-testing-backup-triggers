@@ -1,0 +1,29 @@
+pipeline {
+    agent any
+
+    triggers {
+        cron('0 0 * * *')
+    }
+
+    environment {
+        PYTHON_BIN = '/home/dheeraj/netman-finals-poc/venv/bin/python3'
+        WORK_DIR   = '/home/dheeraj/netman-finals-poc/jenkins_tests'
+    }
+
+    stages {
+        stage('Nightly Config Backup') {
+            steps {
+                sh "cd ${WORK_DIR} && ${PYTHON_BIN} jenkins_nightly_backup.py"
+            }
+        }
+    }
+
+    post {
+        success {
+            sh "cd ${WORK_DIR} && ${PYTHON_BIN} jenkins_send_notification.py success nightly"
+        }
+        failure {
+            sh "cd ${WORK_DIR} && ${PYTHON_BIN} jenkins_send_notification.py failure nightly"
+        }
+    }
+}
