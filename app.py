@@ -40,8 +40,10 @@ def receive_config(hostname: str):
 
     backup_config(hostname)
     promote_beta_config(hostname)
-    
+
     output = set_config(hostname, config)
+
+    backup_config(hostname)
 
     jenkins_triggered = trigger_jenkins_pipeline(changed_hostname=hostname)
 
